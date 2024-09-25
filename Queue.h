@@ -5,24 +5,29 @@
 extern "C" 
 {
 #endif
+// Data types
 
-//put your prototypes here
-typedef struct QueueNode {
-    int data;
-    struct QueueNode* next;
-} QueueNode;
+typedef struct Node{
+    void * item;
+    struct Node * next;
+} Node;
 
-// Define the queue structure
-typedef struct Queue {
-    QueueNode* front;
-    QueueNode* rear;
+
+typedef struct Queue{
+    Node * front;
+    Node * back;
 } Queue;
 
-Queue* createQueue();
-void enqueue(Queue* queue, int item);
-int dequeue(Queue* queue);
-int isQueueEmpty(Queue* queue);
-void freeQueue(Queue* queue);
+
+//Prototypes
+Queue * createQueue();
+Node * createNode();
+void Enqueue(Queue * Q, void * item);
+void * Dequeue(Queue * Q);
+int IsEmptyQueue(Queue * Q);
+void PrintNodes(Node * nodelist);
+void PrintQueue(Queue * Q);
+void DestroyQueue(Queue * Q);
 
 
 #ifdef __cplusplus

@@ -2,65 +2,106 @@
 #include <stdio.h>
 #include "Queue.h"
 
-// Create a new queue
-Queue* createQueue() {
-    Queue* queue = (Queue*)malloc(sizeof(Queue));
-    queue->front = queue->rear = NULL;
-    return queue;
+// Function to create a new queue
+Queue * createQueue()
+{
+    Queue * Q = malloc(sizeof(Queue));  // Allocate memory for the queue
+    Q->front = NULL;  // Initialize front to NULL
+    Q->back = NULL;   // Initialize back to NULL
+    return Q;
 }
 
-// Enqueue an element
-void enqueue(Queue* queue, int value) {
-    // Create a new node
-    QueueNode* newNode = (QueueNode*)malloc(sizeof(QueueNode));
-    newNode->data = value;
-    newNode->next = NULL;
-    
-    // If queue is empty, both front and rear are the new node
-    if (queue->rear == NULL) {
-        queue->front = queue->rear = newNode;
-        return;
+// Function to create a new node for the queue
+Node * createNode()
+{
+    Node * node = malloc(sizeof(Node));  // Allocate memory for the node
+    node->item = NULL;  // Initialize item to NULL
+    node->next = NULL;  // Initialize next to NULL
+    return node;
+}
+
+// Function to add an item to the queue (enqueue)
+void Enqueue(Queue * Q, void * item)
+{
+    Node * node = createNode();  // Create a new node
+    node->item = item;           // Set the node's item to the given item
+
+    // Insert the node at the back of the queue
+    if (Q->back == NULL)  // If the queue is empty
+    {
+        Q->front = node;  // Set both front and back to the new node
+        Q->back = node;
+    }
+    else
+    {
+        node->next = Q->back;  // Attach the current back node to the new node
+        Q->back = node;        // Move the back pointer to the new node
+    }
+}
+
+// Function to remove an item from the queue (dequeue)
+void * Dequeue(Queue * Q)
+{
+    if (IsEmptyQueue(Q))  // If the queue is empty, return NULL
+    {
+        return NULL;
     }
 
-    // Add the new node to the end of the queue
-    queue->rear->next = newNode;
-    queue->rear = newNode;
-}
+    Node * node = Q->front;  // Get the front node
+    Node * prev = Q->back;   // Get the back node
 
-// Dequeue an element
-int dequeue(Queue* queue) {
-    if (queue->front == NULL) {
-        return -1; // Queue is empty
-    }
-    
-    // Get the front node
-    QueueNode* temp = queue->front;
-    int value = temp->data;
-
-    // Move the front to the next node
-    queue->front = queue->front->next;
-
-    // If front becomes NULL, set rear to NULL
-    if (queue->front == NULL) {
-        queue->rear = NULL;
+    // Traverse to the node just before the front
+    while (prev && prev->next != node)
+    {
+        prev = prev->next;
     }
 
-    // Free the dequeued node and return its value
-    free(temp);
-    return value;
-}
-
-// Check if the queue is empty
-int isQueueEmpty(Queue* queue) {
-    return queue->front == NULL;
-}
-
-// Free the queue memory
-void freeQueue(Queue* queue) {
-    while (!isQueueEmpty(queue)) {
-        dequeue(queue);
+    // If only one element is left in the queue
+    if (prev == node)
+    {
+        Q->back = NULL;
+        Q->front = NULL;
     }
-    free(queue);
+    else if (prev && prev->next == node)
+    {
+        prev->next = NULL;   // Remove the link to the front node
+        Q->front = prev;     // Move front to the previous node
+    }
+
+    void * item = node->item;  // Store the item to return
+    free(node);                // Free the memory of the dequeued node
+    return item;
 }
 
+// Function to check if the queue is empty
+int IsEmptyQueue(Queue * Q)
+{
+    return (Q == NULL || Q->front == NULL);  // Queue is empty if front is NULL
+}
 
+// Recursive function to print the nodes in the queue
+void PrintNodes(Node * node)
+{
+    if (node != NULL)
+    {
+        PrintNodes(node->next);  // Recursively print next nodes
+        printf("x");  // Print 'x' for each node
+    }
+}
+
+// Function to print the entire queue
+void PrintQueue(Queue * Q)
+{
+    PrintNodes(Q->back);  // Print nodes starting from the back
+    printf("\n");         // Newline after the queue is printed
+}
+
+// Function to destroy the queue and free memory
+void DestroyQueue(Queue * Q)
+{
+    while (!IsEmptyQueue(Q))  // Dequeue until the queue is empty
+    {
+        Dequeue(Q);
+    }
+    free(Q);  // Free the queue itself
+}
